@@ -2,15 +2,22 @@ var camera, scene, renderer;
 
 var SCREEN_WIDTH = window.innerWidth;
 var SCREEN_HEIGHT = window.innerHeight;
-var aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
-var cameraFront, cameraTop, cameraSide;
-var frustumSize = 220;
-var un = 5;
+
+var fov = 50; //Camera frustum vertical field of view.
+var far = 1000; //Camera frustum far plane.
+var near = 1; //Camera frustum near plane.
+var aspect = SCREEN_WIDTH / SCREEN_HEIGHT; //Camera frustum aspect ratio.
+var frustumSize = 100;
+var clock, delta, grass;
+
+var cameraPerspective;
 
 var keys = {
 }
 
-
+function createGolf(grass, flag) {
+    golf = new Golf(grass, flag);
+}
 
 function createScene() {
     'use strict';
@@ -20,11 +27,19 @@ function createScene() {
 
     scene.add(new THREE.AmbientLight(0x404040)); //soft ambient light
 
+    createGolf(new Grass(0,0,0,40,40), new Flag(0,0,0,0.25,10,3));
 }
 
 function createCamera() {
     'use strict';
+    cameraPerspective = new THREE.PerspectiveCamera(fov, aspect, near, far);
 
+    /*PERSPECTIVE POSITION*/
+    cameraPerspective.position.set(35, 35, 35);
+    cameraPerspective.lookAt(scene.position);
+    scene.add(cameraPerspective);
+
+    camera = cameraPerspective;
 }
 
 function onResize() {
