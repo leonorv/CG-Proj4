@@ -1,4 +1,4 @@
-var camera, scene, renderer, skybox;
+var camera, scene, renderer, skybox, ball, pointLight;
 
 var SCREEN_WIDTH = window.innerWidth;
 var SCREEN_HEIGHT = window.innerHeight;
@@ -19,6 +19,27 @@ function createGolf(grass, flag) {
     golf = new Golf(grass, flag);
 }
 
+function createBall() {
+    var textureLoader = new THREE.TextureLoader();
+    var ball_texture = textureLoader.load("golf_ball_texture.jpg");
+    ball_texture.wrapS = THREE.RepeatWrapping;
+    ball_texture.wrapT = THREE.RepeatWrapping;
+    ball_texture.repeat.set( 1, 1 );
+
+    ball_geometry = new THREE.SphereGeometry( 2, 32, 32 );
+    ball_material = new THREE.MeshPhongMaterial( {color: 0xffffff, map: ball_texture} );
+    ball = new THREE.Mesh(ball_geometry, ball_material );
+    ball.position.set(0, 2, 0);
+    scene.add(ball);
+}
+
+function createLights() {
+    pointLight = new THREE.PointLight( 0xFFF8BC, 2, 50 );
+    pointLight.add( new THREE.Mesh(new THREE.SphereGeometry( 1, 10, 10 ), new THREE.MeshBasicMaterial( { color: 0xFFF8BC } ) ) );
+    pointLight.position.set(10, 1, 10);
+	scene.add(pointLight);
+}
+
 function createScene() {
     'use strict';
 
@@ -27,7 +48,9 @@ function createScene() {
 
     scene.add(new THREE.DirectionalLight( 0xffffff, 1));
 
-    createGolf(new Grass(0,0,0,100,100), new Flag(0,0,0,0.25,10,3));
+    createGolf(new Grass(0,0,0,100,100), new Flag(20,0,20,0.25,10,3));
+    createBall();
+    createLights();
 }
 
 function createCamera() {

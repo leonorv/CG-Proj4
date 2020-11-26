@@ -11,11 +11,11 @@ class Grass extends THREE.Object3D {
 
         base_texture.wrapS = THREE.RepeatWrapping;
         base_texture.wrapT = THREE.RepeatWrapping;
-        base_texture.repeat.set( 4, 4 );
+        base_texture.repeat.set( 8, 8 );
 
         bump_map.wrapS = THREE.RepeatWrapping;
         bump_map.wrapT = THREE.RepeatWrapping;
-        bump_map.repeat.set( 1, 1 );
+        bump_map.repeat.set( 8, 8 );
 
         this.material = new THREE.MeshPhongMaterial({map: base_texture, bumpMap: bump_map});
         this.geometry = new THREE.PlaneGeometry(this.width, this.height);
@@ -32,8 +32,8 @@ class Flag extends THREE.Object3D {
     constructor(x, y, z, radius, height, side) {
         'use strict'
         super();
-        this.stickMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, wireframe: false});
-        this.flagMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, wireframe: false});
+        this.stickMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, wireframe: false, side: THREE.DoubleSide});
+        this.flagMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, wireframe: false, side: THREE.DoubleSide});
         this.stickGeometry = new THREE.CylinderGeometry(radius, radius, height, 30);
         this.flagGeometry = new FlagGeometry(height, side);
         this.stickMesh = new THREE.Mesh(this.stickGeometry, this.stickMaterial);
