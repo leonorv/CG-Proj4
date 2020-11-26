@@ -4,9 +4,24 @@ class Grass extends THREE.Object3D {
         super();
         this.width = width;
         this.height = height;
-        this.material = new THREE.MeshPhongMaterial({color: 0xa3a38e});
+
+        var textureLoader = new THREE.TextureLoader();
+        var base_texture = textureLoader.load("base_grass.jpg");
+        var bump_map = textureLoader.load("grass_bump_map.jpg");
+
+        base_texture.wrapS = THREE.RepeatWrapping;
+        base_texture.wrapT = THREE.RepeatWrapping;
+        base_texture.repeat.set( 4, 4 );
+
+        bump_map.wrapS = THREE.RepeatWrapping;
+        bump_map.wrapT = THREE.RepeatWrapping;
+        bump_map.repeat.set( 1, 1 );
+
+        this.material = new THREE.MeshPhongMaterial({map: base_texture, bumpMap: bump_map});
         this.geometry = new THREE.PlaneGeometry(this.width, this.height);
         this.mesh = new THREE.Mesh(this.geometry, this.material);
+        this.mesh.receiveShadow = true;
+        this.mesh.castShadow = true;
         this.add(this.mesh);
         this.position.set(x, y, z);
         scene.add(this);

@@ -25,7 +25,7 @@ function createScene() {
     scene = new THREE.Scene();
     scene.add(new THREE.AxisHelper(10));
 
-    scene.add(new THREE.AmbientLight(0x404040)); //soft ambient light
+    scene.add(new THREE.DirectionalLight( 0xffffff, 1));
 
     createGolf(new Grass(0,0,0,40,40), new Flag(0,0,0,0.25,10,3));
 }
@@ -40,6 +40,12 @@ function createCamera() {
     scene.add(cameraPerspective);
 
     camera = cameraPerspective;
+}
+
+function createOrbitControls() {
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.target.set(0, 0, 0);
+    controls.update();
 }
 
 function onResize() {
@@ -97,6 +103,7 @@ function init() {
 
     createScene();
     createCamera();
+    createOrbitControls();
 
     render();
 
