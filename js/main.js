@@ -1,4 +1,4 @@
-var camera, scene, renderer;
+var camera, scene, renderer, skybox;
 
 var SCREEN_WIDTH = window.innerWidth;
 var SCREEN_HEIGHT = window.innerHeight;
@@ -27,7 +27,7 @@ function createScene() {
 
     scene.add(new THREE.DirectionalLight( 0xffffff, 1));
 
-    createGolf(new Grass(0,0,0,40,40), new Flag(0,0,0,0.25,10,3));
+    createGolf(new Grass(0,0,0,100,100), new Flag(0,0,0,0.25,10,3));
 }
 
 function createCamera() {
@@ -40,6 +40,19 @@ function createCamera() {
     scene.add(cameraPerspective);
 
     camera = cameraPerspective;
+}
+
+function createSkyBox() {
+    var loader = new THREE.CubeTextureLoader();
+    var texture = loader.load([
+      './cubemap/px.png',
+      './cubemap/nx.png',
+      './cubemap/py.png',
+      './cubemap/ny.png',
+      './cubemap/pz.png',
+      './cubemap/nz.png',
+    ]);
+    scene.background = texture;
 }
 
 function createOrbitControls() {
@@ -103,6 +116,7 @@ function init() {
 
     createScene();
     createCamera();
+    createSkyBox();
     createOrbitControls();
 
     render();
