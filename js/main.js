@@ -1,4 +1,4 @@
-var camera, scene, renderer, skybox, ball, pointLight;
+var camera, scene, renderer, skybox, ball, pointLight, dirLight;
 
 var SCREEN_WIDTH = window.innerWidth;
 var SCREEN_HEIGHT = window.innerHeight;
@@ -9,35 +9,29 @@ var near = 1; //Camera frustum near plane.
 var aspect = SCREEN_WIDTH / SCREEN_HEIGHT; //Camera frustum aspect ratio.
 var frustumSize = 100;
 var clock, delta, grass;
+var onPause = false;
 
 var cameraPerspective;
 
 var keys = {
+    68: false,
+    80: false,
+    87: false,
+    83: false
 }
+
 
 function createGolf(grass, flag) {
     golf = new Golf(grass, flag);
 }
 
 function createBall() {
-    var textureLoader = new THREE.TextureLoader();
-    var ball_texture = textureLoader.load("golf_ball_texture.jpg");
-    ball_texture.wrapS = THREE.RepeatWrapping;
-    ball_texture.wrapT = THREE.RepeatWrapping;
-    ball_texture.repeat.set( 1, 1 );
-
-    ball_geometry = new THREE.SphereGeometry( 2, 32, 32 );
-    ball_material = new THREE.MeshPhongMaterial( {color: 0xffffff, map: ball_texture} );
-    ball = new THREE.Mesh(ball_geometry, ball_material );
-    ball.position.set(0, 2, 0);
-    scene.add(ball);
+    ball = new Ball(0, 2, 0, 2);
 }
 
 function createLights() {
-    pointLight = new THREE.PointLight( 0xFFF8BC, 2, 50 );
-    pointLight.add( new THREE.Mesh(new THREE.SphereGeometry( 1, 10, 10 ), new THREE.MeshBasicMaterial( { color: 0xFFF8BC } ) ) );
-    pointLight.position.set(10, 1, 10);
-	scene.add(pointLight);
+    pointLight = new PointLight();
+    dirLight = new DirLight();
 }
 
 function createScene() {
@@ -46,7 +40,6 @@ function createScene() {
     scene = new THREE.Scene();
     scene.add(new THREE.AxisHelper(10));
 
-    scene.add(new THREE.DirectionalLight( 0xffffff, 1));
 
     createGolf(new Grass(0,0,0,100,100), new Flag(20,0,20,0.25,10,3));
     createBall();
@@ -84,6 +77,15 @@ function createOrbitControls() {
     controls.update();
 }
 
+function changeWireframeMode() {
+    ball.changeWireframeMode();
+    golf.changeWireframeMode();
+}
+
+function changeSceneStatus() {
+    onPause = !onPause;
+}
+
 function onResize() {
     'use strict';
 
@@ -105,8 +107,28 @@ function onKeyDown(e) {
     keys[e.keyCode] = true;
 
     switch(e.keyCode) {
+        case 68: //d - turn off/on dir light
+            dirLight.changeStatus();
+            onResize();
+            break;
+        case 80: //p - turn off/on point light
+            pointLight.changeStatus();
+            onResize();
+            break;
+        case 87: //w - wireframe model
+            changeWireframeMode();
+            onResize();
+            break;
+        case 83: //s - stop/start scene
+            changeSceneStatus();
+            onResize();
+            break;
 
     }
+}
+
+function updateScene() {
+    golf.flag.rotate();
 }
 
 function onKeyUp(e) {
@@ -116,6 +138,7 @@ function onKeyUp(e) {
 
 function render() {
     'use strict';
+    if (onPause) return; //stops rendering if on pause
     delta = clock.getDelta();
     keyPressed(delta);
     renderer.render(scene, camera);
@@ -151,6 +174,7 @@ function init() {
 
 function animate() {
     'use strict';
+    updateScene();
     render();
     requestAnimationFrame(animate);
 }
