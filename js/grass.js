@@ -49,7 +49,7 @@ class Flag extends THREE.Object3D {
         this.flagMaterials = [this.flagPhongMaterial, this.flagBasicMaterial];
 
         this.stickGeometry = new THREE.CylinderGeometry(radius, radius, height, 10);
-        this.flagGeometry = new FlagGeometry(height, side);
+        this.flagGeometry = new FlagGeometry(height/2, side);
         this.stickMesh = new THREE.Mesh(this.stickGeometry, this.stickMaterials[0]);
         this.flagMesh = new THREE.Mesh(this.flagGeometry, this.flagMaterials[0]);
         this.add(this.stickMesh);

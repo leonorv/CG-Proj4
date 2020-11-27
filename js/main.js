@@ -1,4 +1,4 @@
-var camera, scene, renderer, skybox, ball, pointLight, dirLight;
+var camera, scene, renderer, skybox, ball, pointLight, dirLight, pauseScreen;
 
 var SCREEN_WIDTH = window.innerWidth;
 var SCREEN_HEIGHT = window.innerHeight;
@@ -50,8 +50,7 @@ function createScene() {
 function createCamera() {
     'use strict';
     cameraOrtho = new THREE.OrthographicCamera( 0.5 * frustumSize * aspect / - 2, 0.5 * frustumSize * aspect / 2, 0.5* frustumSize / 2, 0.5 * frustumSize / - 2, 2, 1000);
-    cameraOrtho.position.set(frustumSize,10,frustumSize);
-    cameraOrtho.lookAt(scene.position);
+    cameraOrtho.position.set(0,0,120);
     scene.add(cameraOrtho);
 
     cameraPerspective = new THREE.PerspectiveCamera(fov, aspect, near, far);
@@ -89,8 +88,15 @@ function changeWireframeMode() {
 function changeSceneStatus() {
     if(clock.running) clock.stop();
     else clock.start();
-    if (camera == cameraPerspective) camera = cameraOrtho;
-    else camera = cameraPerspective;
+    if (camera == cameraPerspective) {
+        pauseScreen = new PauseScreen();
+        scene.add(pauseScreen)
+        camera = cameraOrtho;
+    }
+    else {
+        camera = cameraPerspective;
+        scene.remove(pauseScreen);
+    }
 }
 
 function changeLightCalculationStatus() {
@@ -156,6 +162,11 @@ function onKeyDown(e) {
 
 function updateScene() {
     golf.flag.rotate(delta);
+    /*if (ball.userData.jumping) {
+        ball.userData.step += 0.04;
+        ball.position.y = Math.abs(30 * (Math.sin(ball.userData.step)));
+        ball.position.z = 15 * (Math.cos(ball.userData.step));
+    }*/
 }
 
 function onKeyUp(e) {
