@@ -9,8 +9,10 @@ class Ball extends THREE.Object3D {
         ball_texture.repeat.set( 1, 1 );
 
         this.geometry = new THREE.SphereGeometry( 2, 32, 32 );
-        this.material = new THREE.MeshPhongMaterial( {color: 0xffffff, map: ball_texture, specular: 0xffffff, shininess: 50} );
-        this.mesh = new THREE.Mesh(this.geometry, this.material );
+        this.phongMaterial = new THREE.MeshPhongMaterial( {color: 0xffffff, map: ball_texture, specular: 0xffffff, shininess: 50} );
+        this.basicMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, map: ball_texture});
+        this.materials = [this.phongMaterial, this.basicMaterial];
+        this.mesh = new THREE.Mesh(this.geometry, this.materials[0]);
         this.add(this.mesh);
         this.position.set(x, y, z);
         scene.add(this);
@@ -18,5 +20,10 @@ class Ball extends THREE.Object3D {
 
     changeWireframeMode() {
         this.material.wireframe = !this.material.wireframe;
+    }
+
+    changeLightCalculationStatus() {
+        if(this.mesh.material == this.phongMaterial) this.mesh.material = this.materials[1];
+        else this.mesh.material = this.materials[0];
     }
 }

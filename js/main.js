@@ -17,7 +17,8 @@ var keys = {
     68: false,
     80: false,
     87: false,
-    83: false
+    83: false,
+    73: false
 }
 
 
@@ -83,7 +84,13 @@ function changeWireframeMode() {
 }
 
 function changeSceneStatus() {
-    onPause = !onPause;
+    if(clock.running) clock.stop();
+    else clock.start();
+}
+
+function changeLightCalculationStatus() {
+    ball.changeLightCalculationStatus();
+    golf.changeLightCalculationStatus();
 }
 
 function onResize() {
@@ -119,6 +126,10 @@ function onKeyDown(e) {
             changeWireframeMode();
             onResize();
             break;
+        case 73: //i - ilumination calculations
+            changeLightCalculationStatus();
+            onResize();
+            break;
         case 83: //s - stop/start scene
             changeSceneStatus();
             onResize();
@@ -128,7 +139,7 @@ function onKeyDown(e) {
 }
 
 function updateScene() {
-    golf.flag.rotate();
+    golf.flag.rotate(delta);
 }
 
 function onKeyUp(e) {
@@ -138,7 +149,6 @@ function onKeyUp(e) {
 
 function render() {
     'use strict';
-    if (onPause) return; //stops rendering if on pause
     delta = clock.getDelta();
     keyPressed(delta);
     renderer.render(scene, camera);

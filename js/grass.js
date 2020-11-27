@@ -17,14 +17,22 @@ class Grass extends THREE.Object3D {
         bump_map.wrapT = THREE.RepeatWrapping;
         bump_map.repeat.set( 8, 8 );
 
-        this.material = new THREE.MeshPhongMaterial({map: base_texture, bumpMap: bump_map});
+
+        this.phongMaterial = new THREE.MeshPhongMaterial({map: base_texture, bumpMap: bump_map});
+        this.basicMaterial = new THREE.MeshBasicMaterial({map: base_texture});
+        this.materials = [this.phongMaterial, this.basicMaterial];
         this.geometry = new THREE.PlaneGeometry(this.width, this.height);
-        this.mesh = new THREE.Mesh(this.geometry, this.material);
+        this.mesh = new THREE.Mesh(this.geometry, this.materials[0]);
         this.mesh.receiveShadow = true;
         this.mesh.castShadow = true;
         this.add(this.mesh);
         this.position.set(x, y, z);
         scene.add(this);
+    }
+
+    changeLightCalculationStatus() {
+        if(this.mesh.material == this.phongMaterial) this.mesh.material = this.materials[1];
+        else this.mesh.material = this.materials[0];
     }
 }
 
@@ -32,12 +40,18 @@ class Flag extends THREE.Object3D {
     constructor(x, y, z, radius, height, side) {
         'use strict'
         super();
-        this.stickMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, wireframe: false, side: THREE.DoubleSide});
-        this.flagMaterial = new THREE.MeshPhongMaterial({color: 0xff0000, wireframe: false, side: THREE.DoubleSide});
+        this.stickPhongMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, wireframe: false, side: THREE.DoubleSide});
+        this.stickBasicMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: false, side: THREE.DoubleSide});
+        this.stickMaterials = [this.stickPhongMaterial, this.stickBasicMaterial];
+
+        this.flagPhongMaterial = new THREE.MeshPhongMaterial({color: 0xff0000, wireframe: false, side: THREE.DoubleSide});
+        this.flagBasicMaterial = new THREE.MeshBasicMaterial({color: 0xff0000, wireframe: false, side: THREE.DoubleSide});
+        this.flagMaterials = [this.flagPhongMaterial, this.flagBasicMaterial];
+
         this.stickGeometry = new THREE.CylinderGeometry(radius, radius, height, 10);
         this.flagGeometry = new FlagGeometry(height, side);
-        this.stickMesh = new THREE.Mesh(this.stickGeometry, this.stickMaterial);
-        this.flagMesh = new THREE.Mesh(this.flagGeometry, this.flagMaterial);
+        this.stickMesh = new THREE.Mesh(this.stickGeometry, this.stickMaterials[0]);
+        this.flagMesh = new THREE.Mesh(this.flagGeometry, this.flagMaterials[0]);
         this.add(this.stickMesh);
         this.stickMesh.add(this.flagMesh);
         scene.add(this);
@@ -49,8 +63,19 @@ class Flag extends THREE.Object3D {
         this.flagMaterial.wireframe = !this.flagMaterial.wireframe;
     }
 
-    rotate() {
-        this.flagMesh.rotateY(0.05);
+    changeLightCalculationStatus() {
+        if(this.stickMesh.material == this.stickPhongMaterial){
+            this.stickMesh.material = this.stickMaterials[1];
+            this.flagMesh.material = this.flagMaterials[1];
+        }
+        else {
+            this.stickMesh.material = this.stickMaterials[0];
+            this.flagMesh.material = this.flagMaterials[0];
+        }
+    }
+
+    rotate(delta) {
+        this.flagMesh.rotateY(1.2*delta);
     }
 }
 
@@ -83,5 +108,10 @@ class Golf extends THREE.Object3D {
     changeWireframeMode() {
         this.grass.material.wireframe = !this.grass.material.wireframe;
         this.flag.changeWireframeMode();
+    }
+
+    changeLightCalculationStatus() {
+        this.grass.changeLightCalculationStatus();
+        this.flag.changeLightCalculationStatus();
     }
 }
