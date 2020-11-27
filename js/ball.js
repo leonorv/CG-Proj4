@@ -2,6 +2,9 @@ class Ball extends THREE.Object3D {
     constructor(x, y, z, radius) {
         'use strict'
         super();
+        this.x = x;
+        this.y = y;
+        this.z = z;
         var textureLoader = new THREE.TextureLoader();
         var ball_texture = textureLoader.load("golf_ball_texture.jpg");
         ball_texture.wrapS = THREE.RepeatWrapping;
@@ -26,4 +29,5 @@ class Ball extends THREE.Object3D {
         if(this.mesh.material == this.phongMaterial) this.mesh.material = this.materials[1];
         else this.mesh.material = this.materials[0];
     }
+
 }

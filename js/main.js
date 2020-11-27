@@ -11,7 +11,7 @@ var frustumSize = 100;
 var clock, delta, grass;
 var onPause = false;
 
-var cameraPerspective;
+var cameraPerspective, cameraOrtho;
 
 var keys = {
     68: false,
@@ -49,9 +49,12 @@ function createScene() {
 
 function createCamera() {
     'use strict';
-    cameraPerspective = new THREE.PerspectiveCamera(fov, aspect, near, far);
+    cameraOrtho = new THREE.OrthographicCamera( 0.5 * frustumSize * aspect / - 2, 0.5 * frustumSize * aspect / 2, 0.5* frustumSize / 2, 0.5 * frustumSize / - 2, 2, 1000);
+    cameraOrtho.position.set(frustumSize,10,frustumSize);
+    cameraOrtho.lookAt(scene.position);
+    scene.add(cameraOrtho);
 
-    /*PERSPECTIVE POSITION*/
+    cameraPerspective = new THREE.PerspectiveCamera(fov, aspect, near, far);
     cameraPerspective.position.set(35, 35, 35);
     cameraPerspective.lookAt(scene.position);
     scene.add(cameraPerspective);
@@ -86,11 +89,20 @@ function changeWireframeMode() {
 function changeSceneStatus() {
     if(clock.running) clock.stop();
     else clock.start();
+    if (camera == cameraPerspective) camera = cameraOrtho;
+    else camera = cameraPerspective;
 }
 
 function changeLightCalculationStatus() {
     ball.changeLightCalculationStatus();
     golf.changeLightCalculationStatus();
+}
+
+function resetScene() {
+    createScene();
+    createCamera();
+    createSkyBox();
+    createOrbitControls();
 }
 
 function onResize() {
@@ -132,6 +144,10 @@ function onKeyDown(e) {
             break;
         case 83: //s - stop/start scene
             changeSceneStatus();
+            onResize();
+            break;
+        case 82: //r - reset scene
+            resetScene();
             onResize();
             break;
 
