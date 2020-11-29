@@ -1,4 +1,4 @@
-var camera, scene, renderer, skybox, ball, pointLight, dirLight, pauseScreen;
+var camera, scene, renderer, skybox, ball, pointLight, dirLight, pauseScreen, controls, camToSave = {}, toReset = false;
 
 var SCREEN_WIDTH = window.innerWidth;
 var SCREEN_HEIGHT = window.innerHeight;
@@ -11,6 +11,7 @@ var frustumSize = 100;
 var clock, delta, grass;
 var onPause = false;
 
+
 var cameraPerspective, cameraOrtho;
 
 var keys = {
@@ -18,7 +19,8 @@ var keys = {
     80: false,
     87: false,
     83: false,
-    73: false
+    73: false,
+    66: false
 }
 
 
@@ -39,10 +41,10 @@ function createScene() {
     'use strict';
 
     scene = new THREE.Scene();
-    scene.add(new THREE.AxisHelper(10));
+    //scene.add(new THREE.AxisHelper(10));
 
 
-    createGolf(new Grass(0,0,0,100,100), new Flag(20,0,20,0.25,10,3));
+    createGolf(new Grass(0,0,0,100,100), new Flag(20,0,20,0.5,30,9));
     createBall();
     createLights();
 }
@@ -75,8 +77,20 @@ function createSkyBox() {
 }
 
 function createOrbitControls() {
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.target.set(0, 0, 0);
+    controls.update();
+
+    camToSave.position = camera.position.clone();
+    camToSave.rotation = camera.rotation.clone();
+    camToSave.controlCenter = controls.target.clone();
+}
+
+function restoreCamera(position, rotation, controlCenter){
+    camera.position.set(position.x, position.y, position.z);
+    camera.rotation.set(rotation.x, rotation.y, rotation.z);
+
+    controls.target.set(controlCenter.x, controlCenter.y, controlCenter.z);
     controls.update();
 }
 
@@ -97,6 +111,8 @@ function changeSceneStatus() {
         camera = cameraPerspective;
         scene.remove(pauseScreen);
     }
+    if (toReset) resetScene();
+    onPause = !onPause;
 }
 
 function changeLightCalculationStatus() {
@@ -105,10 +121,14 @@ function changeLightCalculationStatus() {
 }
 
 function resetScene() {
-    createScene();
-    createCamera();
-    createSkyBox();
-    createOrbitControls();
+    ball.reset();
+    golf.reset();
+    pointLight.reset();
+    dirLight.reset();
+    camera = cameraPerspective;
+    restoreCamera(camToSave.position, camToSave.rotation, camToSave.controlCenter);
+    toReset = false;
+
 }
 
 function onResize() {
@@ -118,7 +138,8 @@ function onResize() {
 	SCREEN_HEIGHT = window.innerHeight;
     aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 
-    renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+    if (onPause) renderer.setSize(PAUSE_SCREEN_WIDTH, PAUSE_SCREEN_HEIGHT);
+    else renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
     camera.left = - 0.5 * frustumSize * aspect / 2;
     camera.right = 0.5 * frustumSize * aspect / 2;
@@ -132,6 +153,10 @@ function onKeyDown(e) {
     keys[e.keyCode] = true;
 
     switch(e.keyCode) {
+        case 66: //d - turn off/on dir light
+            ball.changeJumpingStatus();
+            onResize();
+            break;
         case 68: //d - turn off/on dir light
             dirLight.changeStatus();
             onResize();
@@ -153,7 +178,7 @@ function onKeyDown(e) {
             onResize();
             break;
         case 82: //r - reset scene
-            resetScene();
+            toReset = true;
             onResize();
             break;
 
@@ -162,11 +187,11 @@ function onKeyDown(e) {
 
 function updateScene() {
     golf.flag.rotate(delta);
-    /*if (ball.userData.jumping) {
-        ball.userData.step += 0.04;
-        ball.position.y = Math.abs(30 * (Math.sin(ball.userData.step)));
-        ball.position.z = 15 * (Math.cos(ball.userData.step));
-    }*/
+    if (ball.isJumping) {
+        ball.step += 0.04;
+        ball.position.y = ball.radius + Math.abs(10 * (Math.sin(ball.step)));
+        ball.position.z = 7 - 7 * (Math.cos(ball.step));
+    }
 }
 
 function onKeyUp(e) {
@@ -193,6 +218,7 @@ function init() {
 
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
+
 
     clock = new THREE.Clock();
     clock.start();

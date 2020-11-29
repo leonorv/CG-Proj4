@@ -7,7 +7,7 @@ class Grass extends THREE.Object3D {
 
         var textureLoader = new THREE.TextureLoader();
         var base_texture = textureLoader.load("base_grass.jpg");
-        var bump_map = textureLoader.load("grass_bump_map.jpg");
+        var bump_map = textureLoader.load("base_grass_2.jpg");
 
         base_texture.wrapS = THREE.RepeatWrapping;
         base_texture.wrapT = THREE.RepeatWrapping;
@@ -15,10 +15,10 @@ class Grass extends THREE.Object3D {
 
         bump_map.wrapS = THREE.RepeatWrapping;
         bump_map.wrapT = THREE.RepeatWrapping;
-        bump_map.repeat.set( 8, 8 );
+        bump_map.repeat.set( 4, 4 );
 
 
-        this.phongMaterial = new THREE.MeshPhongMaterial({map: base_texture, bumpMap: bump_map});
+        this.phongMaterial = new THREE.MeshPhongMaterial({map: base_texture, bumpMap: bump_map, bumpScale: 0.2});
         this.basicMaterial = new THREE.MeshBasicMaterial({map: base_texture});
         this.materials = [this.phongMaterial, this.basicMaterial];
         this.geometry = new THREE.PlaneGeometry(this.width, this.height);
@@ -34,12 +34,21 @@ class Grass extends THREE.Object3D {
         if(this.mesh.material == this.phongMaterial) this.mesh.material = this.materials[1];
         else this.mesh.material = this.materials[0];
     }
+
+    reset() {
+        this.mesh.material = this.phongMaterial;
+    }
 }
 
 class Flag extends THREE.Object3D {
     constructor(x, y, z, radius, height, side) {
         'use strict'
         super();
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.height = height;
+
         this.stickPhongMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, wireframe: false, side: THREE.DoubleSide});
         this.stickBasicMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: false, side: THREE.DoubleSide});
         this.stickMaterials = [this.stickPhongMaterial, this.stickBasicMaterial];
@@ -75,7 +84,14 @@ class Flag extends THREE.Object3D {
     }
 
     rotate(delta) {
-        this.flagMesh.rotateY(1.2*delta);
+        this.flagMesh.rotation.y += 1.2*delta;
+    }
+
+    reset() {
+        this.stickMesh.material = this.stickMaterials[0];
+        this.flagMesh.material = this.flagMaterials[0];
+        this.flagMesh.rotation.y = 0;
+        
     }
 }
 
@@ -113,5 +129,10 @@ class Golf extends THREE.Object3D {
     changeLightCalculationStatus() {
         this.grass.changeLightCalculationStatus();
         this.flag.changeLightCalculationStatus();
+    }
+
+    reset() {
+        this.grass.reset();
+        this.flag.reset();
     }
 }

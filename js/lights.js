@@ -11,6 +11,10 @@ class PointLight extends THREE.PointLight {
         if (this.visible) this.visible = false;
         else this.visible = true;
     }
+
+    reset() {
+        this.visible = true;
+    }
 }
 
 
@@ -28,5 +32,9 @@ class DirLight extends THREE.DirectionalLight {
     changeStatus() {
         if (this.visible) this.visible = false;
         else this.visible = true;
+    }
+
+    reset() {
+        this.visible = true;
     }
 }
