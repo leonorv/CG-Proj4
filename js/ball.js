@@ -28,7 +28,7 @@ class Ball extends THREE.Object3D {
     }
 
     changeWireframeMode() {
-        this.material.wireframe = !this.material.wireframe;
+        this.mesh.material.wireframe = !this.mesh.material.wireframe;
     }
 
     changeLightCalculationStatus() {

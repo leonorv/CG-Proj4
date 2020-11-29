@@ -18,8 +18,8 @@ class Grass extends THREE.Object3D {
         bump_map.repeat.set( 4, 4 );
 
 
-        this.phongMaterial = new THREE.MeshPhongMaterial({map: base_texture, bumpMap: bump_map, bumpScale: 0.2});
-        this.basicMaterial = new THREE.MeshBasicMaterial({map: base_texture});
+        this.phongMaterial = new THREE.MeshPhongMaterial({map: base_texture, bumpMap: bump_map, bumpScale: 0.2, side: THREE.DoubleSide});
+        this.basicMaterial = new THREE.MeshBasicMaterial({map: base_texture, side: THREE.DoubleSide});
         this.materials = [this.phongMaterial, this.basicMaterial];
         this.geometry = new THREE.PlaneGeometry(this.width, this.height);
         this.mesh = new THREE.Mesh(this.geometry, this.materials[0]);
@@ -49,8 +49,8 @@ class Flag extends THREE.Object3D {
         this.z = z;
         this.height = height;
 
-        this.stickPhongMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, wireframe: false, side: THREE.DoubleSide});
-        this.stickBasicMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: false, side: THREE.DoubleSide});
+        this.stickPhongMaterial = new THREE.MeshPhongMaterial({color: 0x40201D, wireframe: false, side: THREE.DoubleSide});
+        this.stickBasicMaterial = new THREE.MeshBasicMaterial({color: 0x40201D, wireframe: false, side: THREE.DoubleSide});
         this.stickMaterials = [this.stickPhongMaterial, this.stickBasicMaterial];
 
         this.flagPhongMaterial = new THREE.MeshPhongMaterial({color: 0xff0000, wireframe: false, side: THREE.DoubleSide});
@@ -68,8 +68,8 @@ class Flag extends THREE.Object3D {
     }
 
     changeWireframeMode() {
-        this.stickMaterial.wireframe = !this.stickMaterial.wireframe;
-        this.flagMaterial.wireframe = !this.flagMaterial.wireframe;
+        this.stickMesh.material.wireframe = !this.stickMesh.material.wireframe;
+        this.flagMesh.material.wireframe = !this.flagMesh.material.wireframe;
     }
 
     changeLightCalculationStatus() {
@@ -112,27 +112,69 @@ class FlagGeometry extends THREE.Geometry {
     }
 }
 
+class Wall extends THREE.Object3D {
+    constructor(x, y, z, width, height, depth) {
+        super();
+        var textureLoader = new THREE.TextureLoader();
+        var bricks_texture = textureLoader.load("bricks.jpg");
+        bricks_texture.wrapS = THREE.RepeatWrapping;
+        bricks_texture.wrapT = THREE.RepeatWrapping;
+        bricks_texture.repeat.set( 5,1 );
+        this.phongMaterial = new THREE.MeshPhongMaterial({wireframe: false, side: THREE.DoubleSide, map: bricks_texture});
+        this.basicMaterial = new THREE.MeshBasicMaterial({wireframe: false, side: THREE.DoubleSide, map: bricks_texture});
+        this.materials = [this.phongMaterial, this.basicMaterial];
+        this.geometry = new THREE.BoxGeometry(width, height, depth);
+        this.mesh = new THREE.Mesh(this.geometry, this.materials[0]);
+        this.add(this.mesh);
+        this.position.set(x, y + height/2, z);
+        scene.add(this);
+    }
+
+    changeWireframeMode() {
+        this.mesh.material.wireframe = !this.mesh.material.wireframe;
+    }
+
+    changeLightCalculationStatus() {
+        if(this.mesh.material == this.phongMaterial) this.mesh.material = this.materials[1];
+        else this.mesh.material = this.materials[0];
+    }
+
+    reset() {
+        this.mesh.material = this.phongMaterial;
+    }
+}
+
 class Golf extends THREE.Object3D {
     constructor(grass, flag) {
         'use strict'
         super();
         this.grass = grass;
         this.flag =  flag;
+        this.walls = [new Wall(0, 0, this.grass.width/2, this.grass.width + 2, 10, 2), 
+                    new Wall(0, 0, -this.grass.width/2, this.grass.width + 2, 10, 2),
+                    new Wall(-this.grass.width/2, 0, 0, this.grass.width + 2, 10, 2),
+                    new Wall(this.grass.width/2, 0, 0, this.grass.width + 2, 10, 2),
+                    ]
+        this.walls[2].rotateY(Math.PI/2);
+        this.walls[3].rotateY(Math.PI/2);
         grass.rotateX(-Math.PI/2);
     }
 
     changeWireframeMode() {
-        this.grass.material.wireframe = !this.grass.material.wireframe;
+        this.grass.mesh.material.wireframe = !this.grass.mesh.material.wireframe;
         this.flag.changeWireframeMode();
+        this.walls.forEach(wall => wall.changeWireframeMode());
     }
 
     changeLightCalculationStatus() {
         this.grass.changeLightCalculationStatus();
         this.flag.changeLightCalculationStatus();
+        this.walls.forEach(wall => wall.changeLightCalculationStatus());
     }
 
     reset() {
         this.grass.reset();
         this.flag.reset();
+        this.walls.forEach(wall => wall.reset());
     }
 }
