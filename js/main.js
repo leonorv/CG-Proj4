@@ -64,12 +64,12 @@ function createCamera() {
 function createSkyBox() {
     var loader = new THREE.CubeTextureLoader();
     var texture = loader.load([
-      './cubemap/px.png',
-      './cubemap/nx.png',
-      './cubemap/py.png',
-      './cubemap/ny.png',
-      './cubemap/pz.png',
-      './cubemap/nz.png',
+        './cubemap/px.png',
+        './cubemap/nx.png',
+        './cubemap/ny.png',
+        './cubemap/py.png',
+        './cubemap/pz.png',
+        './cubemap/nz.png',
     ]);
     scene.background = texture;
 }

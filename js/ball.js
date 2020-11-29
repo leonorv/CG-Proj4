@@ -6,14 +6,17 @@ class Ball extends THREE.Object3D {
         this.y = y;
         this.z = z;
         var textureLoader = new THREE.TextureLoader();
-        var ball_texture = textureLoader.load("golf_ball_texture.jpg");
-        ball_texture.wrapS = THREE.RepeatWrapping;
-        ball_texture.wrapT = THREE.RepeatWrapping;
-        ball_texture.repeat.set( 1, 1 );
+        var ball_texture = textureLoader.load("ball_texture.png");
+        //ball_texture.wrapS = THREE.RepeatWrapping
+        //ball_texture.wrapT = THREE.RepeatWrapping
+        //ball_texture.repeat.set( 0.8, 0.8 );
 
-        this.geometry = new THREE.SphereGeometry( 2, 32, 32 );
-        this.phongMaterial = new THREE.MeshPhongMaterial( {color: 0xffffff, map: ball_texture, specular: 0xffffff, shininess: 50} );
-        this.basicMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, map: ball_texture});
+        this.geometry = new THREE.SphereGeometry( 2, 32, 16 );
+
+        
+
+        this.phongMaterial = new THREE.MeshPhongMaterial( {color: 0xffffff, bumpMap: ball_texture, specular: 0xD7D7DB, shininess: 40} );
+        this.basicMaterial = new THREE.MeshBasicMaterial({color: 0xffffff});
         this.materials = [this.phongMaterial, this.basicMaterial];
         this.mesh = new THREE.Mesh(this.geometry, this.materials[0]);
         this.add(this.mesh);
