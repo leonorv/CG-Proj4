@@ -69,8 +69,6 @@ function createCamera() {
     cameraPerspective.position.set(35, 35, 35);
     cameraPerspective.lookAt(scene.position);
     scene.add(cameraPerspective);
-
-    //camera = cameraPerspective;
 }
 
 function createSkyBox() {
@@ -177,6 +175,7 @@ function onKeyDown(e) {
 }
 
 function updateScene() {
+    if (onPause) return;
     golf.flag.rotate(delta);
     if (ball.isJumping) {
         ball.step += 0.04;
@@ -192,8 +191,6 @@ function onKeyUp(e) {
 
 function render() {
     'use strict';
-    delta = clock.getDelta();
-    keyPressed(delta);
     renderer.autoClear = false;
     renderer.clear();
     renderer.render(scene, cameraPerspective);
@@ -202,6 +199,8 @@ function render() {
         renderer.clear();
         renderer.render(pauseScene, cameraOrtho);
     }
+    delta = clock.getDelta();
+    keyPressed(delta);
 }
 
 function keyPressed(delta) {
