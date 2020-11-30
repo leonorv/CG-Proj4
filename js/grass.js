@@ -119,8 +119,8 @@ class Wall extends THREE.Object3D {
         var bricks_texture = textureLoader.load("bricks.jpg");
         bricks_texture.wrapS = THREE.RepeatWrapping;
         bricks_texture.wrapT = THREE.RepeatWrapping;
-        bricks_texture.repeat.set( 5,1 );
-        this.phongMaterial = new THREE.MeshPhongMaterial({wireframe: false, side: THREE.DoubleSide, map: bricks_texture});
+        bricks_texture.repeat.set( 10,1 );
+        this.phongMaterial = new THREE.MeshPhongMaterial({map: bricks_texture, wireframe: false, side: THREE.DoubleSide});
         this.basicMaterial = new THREE.MeshBasicMaterial({wireframe: false, side: THREE.DoubleSide, map: bricks_texture});
         this.materials = [this.phongMaterial, this.basicMaterial];
         this.geometry = new THREE.BoxGeometry(width, height, depth);
@@ -150,10 +150,10 @@ class Golf extends THREE.Object3D {
         super();
         this.grass = grass;
         this.flag =  flag;
-        this.walls = [new Wall(0, 0, this.grass.width/2, this.grass.width + 2, 10, 2), 
-                    new Wall(0, 0, -this.grass.width/2, this.grass.width + 2, 10, 2),
-                    new Wall(-this.grass.width/2, 0, 0, this.grass.width + 2, 10, 2),
-                    new Wall(this.grass.width/2, 0, 0, this.grass.width + 2, 10, 2),
+        this.walls = [new Wall(0, 0, this.grass.width/2, this.grass.width + 2, 5, 2), 
+                    new Wall(0, 0, -this.grass.width/2, this.grass.width + 2, 5, 2),
+                    new Wall(-this.grass.width/2, 0, 0, this.grass.width + 2, 5, 2),
+                    new Wall(this.grass.width/2, 0, 0, this.grass.width + 2, 5, 2),
                     ]
         this.walls[2].rotateY(Math.PI/2);
         this.walls[3].rotateY(Math.PI/2);

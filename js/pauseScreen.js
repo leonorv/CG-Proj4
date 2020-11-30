@@ -8,6 +8,6 @@ class PauseScreen extends THREE.Object3D {
         this.geometry = new THREE.BoxGeometry(120, 70, 1);
         this.mesh = new THREE.Mesh(this.geometry, this.material);
         this.add(this.mesh);
-        this.position.set(0, 0, 100);
+        this.position.set(0, 0, 0);
     }
 }

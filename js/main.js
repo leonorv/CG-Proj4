@@ -1,4 +1,4 @@
-var camera, scene, renderer, skybox, ball, pointLight, dirLight, pauseScreen, controls, camToSave = {}, toReset = false;
+var scene, pauseScene, renderer, skybox, ball, pointLight, dirLight, pauseScreen, controls, camToSave = {};
 
 var SCREEN_WIDTH = window.innerWidth;
 var SCREEN_HEIGHT = window.innerHeight;
@@ -42,6 +42,9 @@ function createScene() {
 
     scene = new THREE.Scene();
     //scene.add(new THREE.AxisHelper(10));
+    createCamera();
+    createSkyBox();
+    createOrbitControls();
 
 
     createGolf(new Grass(0,0,0,100,100), new Flag(20,0,20,0.5,30,9));
@@ -49,18 +52,25 @@ function createScene() {
     createLights();
 }
 
+function createPauseScene() {
+    pauseScene = new THREE.Scene();
+    cameraOrtho = new THREE.OrthographicCamera( 0.5 * frustumSize * aspect / - 2, 0.5 * frustumSize * aspect / 2, 0.5* frustumSize / 2, 0.5 * frustumSize / - 2, 2, 1000);
+    cameraOrtho.position.set(0,0,10);
+    pauseScene.add(cameraOrtho);
+    pauseScreen = new PauseScreen();
+    pauseScene.add(pauseScreen);
+
+}
+
 function createCamera() {
     'use strict';
-    cameraOrtho = new THREE.OrthographicCamera( 0.5 * frustumSize * aspect / - 2, 0.5 * frustumSize * aspect / 2, 0.5* frustumSize / 2, 0.5 * frustumSize / - 2, 2, 1000);
-    cameraOrtho.position.set(0,0,120);
-    scene.add(cameraOrtho);
 
     cameraPerspective = new THREE.PerspectiveCamera(fov, aspect, near, far);
     cameraPerspective.position.set(35, 35, 35);
     cameraPerspective.lookAt(scene.position);
     scene.add(cameraPerspective);
 
-    camera = cameraPerspective;
+    //camera = cameraPerspective;
 }
 
 function createSkyBox() {
@@ -77,18 +87,18 @@ function createSkyBox() {
 }
 
 function createOrbitControls() {
-    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls = new THREE.OrbitControls(cameraPerspective, renderer.domElement);
     controls.target.set(0, 0, 0);
     controls.update();
 
-    camToSave.position = camera.position.clone();
-    camToSave.rotation = camera.rotation.clone();
+    camToSave.position = cameraPerspective.position.clone();
+    camToSave.rotation = cameraPerspective.rotation.clone();
     camToSave.controlCenter = controls.target.clone();
 }
 
 function restoreCamera(position, rotation, controlCenter){
-    camera.position.set(position.x, position.y, position.z);
-    camera.rotation.set(rotation.x, rotation.y, rotation.z);
+    cameraPerspective.position.set(position.x, position.y, position.z);
+    cameraPerspective.rotation.set(rotation.x, rotation.y, rotation.z);
 
     controls.target.set(controlCenter.x, controlCenter.y, controlCenter.z);
     controls.update();
@@ -97,22 +107,6 @@ function restoreCamera(position, rotation, controlCenter){
 function changeWireframeMode() {
     ball.changeWireframeMode();
     golf.changeWireframeMode();
-}
-
-function changeSceneStatus() {
-    if(clock.running) clock.stop();
-    else clock.start();
-    if (camera == cameraPerspective) {
-        pauseScreen = new PauseScreen();
-        scene.add(pauseScreen)
-        camera = cameraOrtho;
-    }
-    else {
-        camera = cameraPerspective;
-        scene.remove(pauseScreen);
-    }
-    if (toReset) resetScene();
-    onPause = !onPause;
 }
 
 function changeLightCalculationStatus() {
@@ -125,10 +119,8 @@ function resetScene() {
     golf.reset();
     pointLight.reset();
     dirLight.reset();
-    camera = cameraPerspective;
+    //camera = cameraPerspective;
     restoreCamera(camToSave.position, camToSave.rotation, camToSave.controlCenter);
-    toReset = false;
-
 }
 
 function onResize() {
@@ -173,11 +165,11 @@ function onKeyDown(e) {
             onResize();
             break;
         case 83: //s - stop/start scene
-            changeSceneStatus();
+            onPause = !onPause;
             onResize();
             break;
         case 82: //r - reset scene
-            toReset = true;
+            if(onPause) resetScene();
             onResize();
             break;
 
@@ -202,7 +194,14 @@ function render() {
     'use strict';
     delta = clock.getDelta();
     keyPressed(delta);
-    renderer.render(scene, camera);
+    renderer.autoClear = false;
+    renderer.clear();
+    renderer.render(scene, cameraPerspective);
+    if (onPause) {
+        renderer.clearDepth();
+        renderer.clear();
+        renderer.render(pauseScene, cameraOrtho);
+    }
 }
 
 function keyPressed(delta) {
@@ -223,9 +222,7 @@ function init() {
     clock.start();
 
     createScene();
-    createCamera();
-    createSkyBox();
-    createOrbitControls();
+    createPauseScene();
 
     render();
 
