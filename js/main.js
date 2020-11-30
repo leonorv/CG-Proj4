@@ -55,7 +55,7 @@ function createScene() {
 function createPauseScene() {
     pauseScene = new THREE.Scene();
     cameraOrtho = new THREE.OrthographicCamera( 0.5 * frustumSize * aspect / - 2, 0.5 * frustumSize * aspect / 2, 0.5* frustumSize / 2, 0.5 * frustumSize / - 2, 2, 1000);
-    cameraOrtho.position.set(0,0,10);
+    cameraOrtho.position.set(0,5,20);
     pauseScene.add(cameraOrtho);
     pauseScreen = new PauseScreen();
     pauseScene.add(pauseScreen);
@@ -117,7 +117,6 @@ function resetScene() {
     golf.reset();
     pointLight.reset();
     dirLight.reset();
-    //camera = cameraPerspective;
     restoreCamera(camToSave.position, camToSave.rotation, camToSave.controlCenter);
 }
 
@@ -128,13 +127,14 @@ function onResize() {
 	SCREEN_HEIGHT = window.innerHeight;
     aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 
-    renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
-    camera.left = - 0.5 * frustumSize * aspect / 2;
-    camera.right = 0.5 * frustumSize * aspect / 2;
-    camera.top = 0.5 * frustumSize / 2;
-    camera.bottom = - 0.5 *  frustumSize / 2;
-    camera.updateProjectionMatrix();
+    renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT );
+    cameraOrtho.left = - 0.5 * frustumSize * aspect / 2;
+    cameraOrtho.right = 0.5 * frustumSize * aspect / 2;
+    cameraOrtho.top = 0.5 * frustumSize / 2;
+    cameraOrtho.bottom = - 0.5 *  frustumSize / 2;
+    cameraPerspective.aspect = aspect;
+    cameraPerspective.updateProjectionMatrix();
+    cameraOrtho.updateProjectionMatrix();
 }
 
 function onKeyDown(e) {
@@ -164,10 +164,11 @@ function onKeyDown(e) {
             break;
         case 83: //s - stop/start scene
             onPause = !onPause;
+            controls.enabled = !controls.enabled;
             onResize();
             break;
         case 82: //r - reset scene
-            if(onPause) resetScene();
+            if (onPause) resetScene();
             onResize();
             break;
 
@@ -191,21 +192,16 @@ function onKeyUp(e) {
 
 function render() {
     'use strict';
+    delta = clock.getDelta();
     renderer.autoClear = false;
     renderer.clear();
     renderer.render(scene, cameraPerspective);
     if (onPause) {
         renderer.clearDepth();
-        renderer.clear();
         renderer.render(pauseScene, cameraOrtho);
     }
-    delta = clock.getDelta();
-    keyPressed(delta);
 }
 
-function keyPressed(delta) {
-
-}
 
 function init() {
     'use strict';

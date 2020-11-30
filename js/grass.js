@@ -33,10 +33,12 @@ class Grass extends THREE.Object3D {
     changeLightCalculationStatus() {
         if(this.mesh.material == this.phongMaterial) this.mesh.material = this.materials[1];
         else this.mesh.material = this.materials[0];
+        this.mesh.material.wireframe = false;
     }
 
     reset() {
         this.mesh.material = this.phongMaterial;
+        this.mesh.material.wireframe = false;
     }
 }
 
@@ -81,6 +83,8 @@ class Flag extends THREE.Object3D {
             this.stickMesh.material = this.stickMaterials[0];
             this.flagMesh.material = this.flagMaterials[0];
         }
+        this.stickMesh.material.wireframe = false;
+        this.flagMesh.material.wireframe = false;
     }
 
     rotate(delta) {
@@ -91,6 +95,8 @@ class Flag extends THREE.Object3D {
         this.stickMesh.material = this.stickMaterials[0];
         this.flagMesh.material = this.flagMaterials[0];
         this.flagMesh.rotation.y = 0;
+        this.stickMesh.material.wireframe = false;
+        this.flagMesh.material.wireframe = false;
         
     }
 }
@@ -116,12 +122,12 @@ class Wall extends THREE.Object3D {
     constructor(x, y, z, width, height, depth) {
         super();
         var textureLoader = new THREE.TextureLoader();
-        var bricks_texture = textureLoader.load("bricks.jpg");
-        bricks_texture.wrapS = THREE.RepeatWrapping;
-        bricks_texture.wrapT = THREE.RepeatWrapping;
-        bricks_texture.repeat.set( 10,1 );
-        this.phongMaterial = new THREE.MeshPhongMaterial({map: bricks_texture, wireframe: false, side: THREE.DoubleSide});
-        this.basicMaterial = new THREE.MeshBasicMaterial({wireframe: false, side: THREE.DoubleSide, map: bricks_texture});
+        var wood_texture = textureLoader.load("wood.jpg");
+        wood_texture.wrapS = THREE.RepeatWrapping;
+        wood_texture.wrapT = THREE.RepeatWrapping;
+        wood_texture.repeat.set( 20,1 );
+        this.phongMaterial = new THREE.MeshPhongMaterial({map: wood_texture, wireframe: false, side: THREE.DoubleSide});
+        this.basicMaterial = new THREE.MeshBasicMaterial({wireframe: false, side: THREE.DoubleSide, map: wood_texture});
         this.materials = [this.phongMaterial, this.basicMaterial];
         this.geometry = new THREE.BoxGeometry(width, height, depth);
         this.mesh = new THREE.Mesh(this.geometry, this.materials[0]);
@@ -137,10 +143,12 @@ class Wall extends THREE.Object3D {
     changeLightCalculationStatus() {
         if(this.mesh.material == this.phongMaterial) this.mesh.material = this.materials[1];
         else this.mesh.material = this.materials[0];
+        this.mesh.material.wireframe = false;
     }
 
     reset() {
         this.mesh.material = this.phongMaterial;
+        this.mesh.material.wireframe = false;
     }
 }
 
@@ -150,10 +158,10 @@ class Golf extends THREE.Object3D {
         super();
         this.grass = grass;
         this.flag =  flag;
-        this.walls = [new Wall(0, 0, this.grass.width/2, this.grass.width + 2, 5, 2), 
-                    new Wall(0, 0, -this.grass.width/2, this.grass.width + 2, 5, 2),
-                    new Wall(-this.grass.width/2, 0, 0, this.grass.width + 2, 5, 2),
-                    new Wall(this.grass.width/2, 0, 0, this.grass.width + 2, 5, 2),
+        this.walls = [new Wall(0, 0, this.grass.width/2, this.grass.width + 0.5, 5, 0.5), 
+                    new Wall(0, 0, -this.grass.width/2, this.grass.width + 0.5, 5, 0.5),
+                    new Wall(-this.grass.width/2, 0, 0, this.grass.width + 0.5, 5, 0.5),
+                    new Wall(this.grass.width/2, 0, 0, this.grass.width + 0.5, 5, 0.5),
                     ]
         this.walls[2].rotateY(Math.PI/2);
         this.walls[3].rotateY(Math.PI/2);
